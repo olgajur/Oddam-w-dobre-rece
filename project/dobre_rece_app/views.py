@@ -1,10 +1,18 @@
 from django.shortcuts import render
+from django.db.models import Sum
 from django.views import View
+from .models import Institution, Donation
 
 
 class LandingPage(View):
     def get(self, request):
-        return render(request, 'index.html', {})
+        sacks = Donation.objects.all().aggregate(Sum('quantity'))
+        institutions = Institution.objects.filter(donation__isnull=False).count()
+        if sacks['quantity__sum'] is None:
+            sacks = 0
+        else:
+            sacks = sacks['quantity__sum']
+        return render(request, 'index.html', {'sacks' : sacks, 'institutions' : institutions})
 
 class AddDonation(View):
     def get(self, request):
