@@ -253,6 +253,55 @@ document.addEventListener("DOMContentLoaded", function() {
     new FormSteps(form);
   }
 
+
+  document.querySelector('form').addEventListener('submit', postData);
+  function postData(event){
+    event.preventDefault();
+
+    let categories = document.querySelectorAll('input[name=categories]');
+    let categoriesValues = [];
+    for (category of categories) {
+      if (category.checked === true) {
+        categoriesValues.push(category.value);
+      }
+    }
+    let sacks = document.querySelector('[name=bags]').value;
+    let institutions = document.querySelectorAll('input[name=organization]');
+    for (institution of institutions) {
+      if (institution.checked === true) {
+        selectedInstitution = institution.value;
+      }
+    }
+    let address = document.querySelector('[name=address]').value;
+    let city = document.querySelector('[name=city]').value;
+    let postcode = document.querySelector('[name=postcode]').value;
+    let phone = document.querySelector('[name=phone]').value;
+    let date = document.querySelector('[type=date]').value;
+    let time = document.querySelector('input[type=time]').value;
+    let moreInfo = document.querySelector('[name=more_info]').value;
+    let dataForm = new FormData();
+
+    dataForm.append('categoriesValues', categoriesValues);
+    dataForm.append('sacks', sacks);
+    dataForm.append('selectedInstitution', selectedInstitution);
+    dataForm.append('address', address);
+    dataForm.append('city', city);
+    dataForm.append('postcode', postcode);
+    dataForm.append('phone', phone);
+    dataForm.append('date', date);
+    dataForm.append('time', time);
+    dataForm.append('moreInfo', moreInfo);
+    dataForm.append('csrfmiddlewaretoken', token);
+    fetch('/add_donation/', {
+      method: 'post',
+      body: dataForm,
+    })
+    .then(response => window.location.assign("/form_confirmation/"))
+    .then((result) => {
+      console.log('Success:', result);
+    })
+  }
+
   // const categories = document.querySelectorAll('[name=categories]');
   // const institutions = document.querySelectorAll('[value=old]');
   // const institutionCats = document.querySelectorAll('[name=institution-categories]');

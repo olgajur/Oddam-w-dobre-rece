@@ -3,6 +3,8 @@ from django.db.models import Sum
 from django.views import View
 from django.contrib.auth import authenticate, login, logout, get_user_model
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.exceptions import ValidationError
+from django.utils.translation import gettext_lazy as _
 from .models import UserManager, User, Institution, Donation, Category
 
 
@@ -52,10 +54,11 @@ class AddDonation(View):
         date = request.POST.get('date')
         time = request.POST.get('time')
         more_info = request.POST.get('moreInfo')
+        user = self.request.user
         new_donation = Donation.objects.create(
         quantity=sacks, institution=institution,
         address=address, phone_number=phone, city=city, zip_code=postcode,
-        pick_up_date=date, pick_up_time=time, pick_up_comment=more_info
+        pick_up_date=date, pick_up_time=time, pick_up_comment=more_info, user=user
         )
         # for category in categories:
         new_donation.categories.add(*categories)
