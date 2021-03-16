@@ -1,12 +1,9 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}Oddaj rzeczy{% endblock %}
-  <body>
-    <header class="header--form-page">
-      <nav class="container container--70">
-        {% block navigation %}{% include 'nav-styles.html' %}{% endblock %}
-      </nav>
-
+{% block header %}class="header--form-page"{% endblock %}
+{% block navigation %}{% include 'nav-styles.html' %}{% endblock %}
+{% block slogan %}
       <div class="slogan container container--90">
         <div class="slogan--item">
           <h1>
@@ -33,7 +30,7 @@
           </div>
         </div>
       </div>
-    </header>
+{% endblock %}
 
 {% block content %}
     <section class="form--steps">
@@ -59,60 +56,27 @@
       <div class="form--steps-container">
         <div class="form--steps-counter">Krok <span>1</span>/5</div>
 
-        <form action="form-confirmation.html" method="post">
+        <form action="" method="POST">
+          {% csrf_token %}
           <!-- STEP 1: class .active is switching steps -->
           <div data-step="1" class="active">
             <h3>Zaznacz co chcesz oddać:</h3>
 
+            {% for category in categories %}
             <div class="form-group form-group--checkbox">
               <label>
                 <input
                   type="checkbox"
                   name="categories"
-                  value="clothes-to-use"
+                  value="{{ category.id }}"
                 />
                 <span class="checkbox"></span>
                 <span class="description"
-                  >ubrania, które nadają się do ponownego użycia</span
+                  >{{ category.name }}</span
                 >
               </label>
             </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input
-                  type="checkbox"
-                  name="categories"
-                  value="clothes-useless"
-                />
-                <span class="checkbox"></span>
-                <span class="description">ubrania, do wyrzucenia</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="checkbox" name="categories" value="toys" />
-                <span class="checkbox"></span>
-                <span class="description">zabawki</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="checkbox" name="categories" value="books" />
-                <span class="checkbox"></span>
-                <span class="description">książki</span>
-              </label>
-            </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="checkbox" name="categories" value="other" />
-                <span class="checkbox"></span>
-                <span class="description">inne</span>
-              </label>
-            </div>
+            {% endfor %}
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn next-step">Dalej</button>
@@ -142,33 +106,20 @@
           <div data-step="3">
             <h3>Wybierz organizacje, której chcesz pomóc:</h3>
 
+            {% for institution in institutions %}
             <div class="form-group form-group--checkbox">
               <label>
-                <input type="radio" name="organization" value="old" />
+                <input type="radio" name="organization" value="{{ institution.id }}" />
                 <span class="checkbox radio"></span>
                 <span class="description">
-                  <div class="title">Fundacja “Bez domu”</div>
+                  <div class="title">{{ institution.name }}</div>
                   <div class="subtitle">
-                    Cel i misja: Pomoc dla osób nie posiadających miejsca
-                    zamieszkania
+                    {{ institution.description }}
                   </div>
                 </span>
               </label>
             </div>
-
-            <div class="form-group form-group--checkbox">
-              <label>
-                <input type="radio" name="organization" value="old" />
-                <span class="checkbox radio"></span>
-                <span class="description">
-                  <div class="title">Fundacja “Dla dzieci"</div>
-                  <div class="subtitle">
-                    Cel i misja: Pomoc osobom znajdującym się w trudnej sytuacji
-                    życiowej.
-                  </div>
-                </span>
-              </label>
-            </div>
+            {% endfor %}
 
             <div class="form-group form-group--buttons">
               <button type="button" class="btn prev-step">Wstecz</button>
@@ -178,7 +129,7 @@
 
           <!-- STEP 5 -->
           <div data-step="4">
-            <h3>Podaj adres oraz termin odbioru rzecz przez kuriera:</h3>
+            <h3>Podaj adres oraz termin odbioru rzeczy przez kuriera:</h3>
 
             <div class="form-section form-section--columns">
               <div class="form-section--column">
@@ -207,7 +158,7 @@
               <div class="form-section--column">
                 <h4>Termin odbioru</h4>
                 <div class="form-group form-group--inline">
-                  <label> Data <input type="date" name="data" /> </label>
+                  <label> Data <input type="date" name="date" /> </label>
                 </div>
 
                 <div class="form-group form-group--inline">
@@ -281,6 +232,67 @@
           </div>
         </form>
       </div>
+      <script>
+        document.querySelector('form').addEventListener('submit', postData);
+        function postData(event){
+          event.preventDefault();
+
+          let categories = document.querySelectorAll('input[name=categories]');
+          let categoriesValues = [];
+          for (category of categories) {
+            if (category.checked === true) {
+              categoriesValues.push(category.value);
+            }
+          }
+          let sacks = document.querySelector('[name=bags]').value;
+          let institutions = document.querySelectorAll('input[name=organization]');
+          for (institution of institutions) {
+            if (institution.checked === true) {
+              selectedInstitution = institution.value;
+            }
+          }
+          let address = document.querySelector('[name=address]').value;
+          let city = document.querySelector('[name=city]').value;
+          let postcode = document.querySelector('[name=postcode]').value;
+          let phone = document.querySelector('[name=phone]').value;
+          let date = document.querySelector('[type=date]').value;
+          let time = document.querySelector('input[type=time]').value;
+          let moreInfo = document.querySelector('[name=more_info]').value;
+          let dataForm = new FormData();
+
+          dataForm.append('categoriesValues', categoriesValues);
+          dataForm.append('sacks', sacks);
+          dataForm.append('selectedInstitution', selectedInstitution);
+          dataForm.append('address', address);
+          dataForm.append('city', city);
+          dataForm.append('postcode', postcode);
+          dataForm.append('phone', phone);
+          dataForm.append('date', date);
+          dataForm.append('time', time);
+          dataForm.append('moreInfo', moreInfo);
+          dataForm.append('csrfmiddlewaretoken', '{{ csrf_token }}');
+          fetch('/add_donation/', {
+            method: 'post',
+            body: dataForm,
+          })
+          .then(response => window.location.assign("{% url 'form-confirmation' %}"))
+          .then((result) => {
+            console.log('Success:', result);
+          })
+        }
+        // const myForm = new FormData(document.querySelector('form'))
+        //
+        //   fetch(
+        //     url='/add_donation/', {
+        //       method : 'POST',
+        //       body : myForm,
+        //     }
+        //   )
+        //   .then(response => response.json())
+        //   .then(json => {
+        //     console.log(json);
+        //   })
+      </script>
     </section>
 {% endblock %}
 {% block footer %}

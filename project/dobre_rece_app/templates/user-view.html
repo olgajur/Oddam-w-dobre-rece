@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Mój profil{% endblock %}
+{% block header %}class="header--form-page"{% endblock %}
+{% block navigation %}{% include 'nav-styles.html' %}{% endblock %}
+{% block content %}
+<section class="about-us">
+  <h2>Mój profil</h2>
+  <div class="about-us--text">
+    <p>{{ current_user.first_name }} {{ current_user.last_name }}</p>
+    <p>{{ current_user.email }}</p>
+  </div>
+</section>
+<section>
+  <div>
+    <ol>
+      {% for donation in my_donations %}
+      <li>
+        <div class="col">
+         <ul>
+          <div class="title"><li>{{ donation.institution }}</li></div>
+          <div class="subtitle"><li>{{ donation.quantity }}</li></div>
+          <li>
+            <ul>
+              {% for category in donation.categories.all %}
+              <div class="col"><div class="text"><li>{{ category.name }}</li></div></div>
+              {% endfor %}
+            </ul>
+          </li>
+          <li>{{ donation.pick_up_time }}, {{ donation.pick_up_date }}</li>
+        </ul>
+        </div>
+      </li>
+      {% endfor %}
+    </ol>
+  </div>
+</section>
+{% endblock %}

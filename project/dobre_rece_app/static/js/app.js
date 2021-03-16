@@ -252,4 +252,23 @@ document.addEventListener("DOMContentLoaded", function() {
   if (form !== null) {
     new FormSteps(form);
   }
+
+  // const categories = document.querySelectorAll('[name=categories]');
+  // const institutions = document.querySelectorAll('[value=old]');
+  // const institutionCats = document.querySelectorAll('[name=institution-categories]');
+  // console.log(institutions);
+  // console.log(institutionCats);
+  // console.log(categories);
+  // for (category of categories) {
+  //   category.addEventListener('click', function(e) {
+  //     if (category.checked) {
+  //       for (institution in institutionCats) {
+  //         if (category.innerText != institution.innerText) {
+  //           institution.parentElement.parentElement.parentElement.parentElement.parentElement.style = 'none'
+  //         }
+  //       }
+  //     }
+  //   });
+  // }
+
 });
